@@ -9,6 +9,7 @@ function App() {
   const [loading, setLoading] = useState(false)
   const [hasMore, setHasMore] = useState(true)
   const [selected, setSelected] = useState(null)
+  const [description, setDescription] = useState('')
   const limit = 20
   const url = `https://pokeapi.co/api/v2/pokemon/${pokemon}`
 
@@ -53,9 +54,21 @@ function App() {
 
 
   function openDetails(id) {
-    console.log('clicked', id);
+     setDescription('')
     axios.get(`https://pokeapi.co/api/v2/pokemon/${id}`).then((response) => {
-      setSelected(response.data)
+       const pokemonData = response.data
+    setSelected(pokemonData)
+
+    axios.get(pokemonData.species.url).then((speciesResponse) => {
+      const entry = speciesResponse.data.flavor_text_entries.find(
+        (e) => e.language.name === 'en'
+      )
+      setDescription(
+        entry
+          ? entry.flavor_text.replace(/[\n\f]/g, ' ')
+          : 'No description available.'
+      )
+    })
     })
   }
 
@@ -88,6 +101,7 @@ function App() {
           fetch pokemon
         </button>
       </div>
+      <p className='guide'>Click on a card to see more details</p>
       <div className='searchedCard'>
         {value && (
           <div className='card' onClick={() => openDetails(value.id)}>
@@ -118,6 +132,7 @@ function App() {
             <button className='closeButton' onClick={closeDetails}>×</button>
             <img className='modalPicture' src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${selected.id}.png`} />
             <h2>{selected.name}</h2>
+            <p className='description'>{description || 'Loading description...'}</p>
             <p>ID: {selected.id}</p>
             <p>Height: {selected.height}</p>
             <p>Weight: {selected.weight}</p>
