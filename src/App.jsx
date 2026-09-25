@@ -133,7 +133,13 @@ function App() {
   }
   return (
     <div>
+      <div className='logo'>
+    <img src="/Pokédex_logo.png" alt="YPokedex logo" />
+    
+  </div>
       <div className='searchBar'>
+        
+
         <input type=" text" value={pokemon} placeholder="Pokemon" onChange={handleInputChange} onKeyDown={handleKeyDown} />
         <button onClick={handleButton}>
           fetch pokemon
