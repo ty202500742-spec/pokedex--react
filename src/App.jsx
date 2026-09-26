@@ -10,6 +10,8 @@ function App() {
   const [hasMore, setHasMore] = useState(true)
   const [selected, setSelected] = useState(null)
   const [description, setDescription] = useState('')
+  const [activeTab, setActiveTab] = useState('about')
+
   const limit = 20
   const url = `https://pokeapi.co/api/v2/pokemon/${pokemon}`
 
@@ -134,11 +136,11 @@ function App() {
   return (
     <div>
       <div className='logo'>
-    <img src="/Pokédex_logo.png" alt="YPokedex logo" />
-    
-  </div>
+        <img src="/Pokédex_logo.png" alt="YPokedex logo" />
+
+      </div>
       <div className='searchBar'>
-        
+
 
         <input type=" text" value={pokemon} placeholder="Pokemon" onChange={handleInputChange} onKeyDown={handleKeyDown} />
         <button onClick={handleButton}>
@@ -148,38 +150,38 @@ function App() {
       <p className='guide'>Click on a card to see more details</p>
       <div className='searchedCard'>
         {value && (
-  <div className="pokemonWrapper">
+          <div className="pokemonWrapper">
 
-    <div className="card" onClick={() => openDetails(value.id)}>
+            <div className="card" onClick={() => openDetails(value.id)}>
 
-      <div className="imageContainer">
-        <span className="pokemonId">#{value.id}</span>
+              <div className="imageContainer">
+                <span className="pokemonId">#{value.id}</span>
 
-        <img
-          className="picture"
-          src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${value.id}.png`}
-        />
-      </div>
+                <img
+                  className="picture"
+                  src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${value.id}.png`}
+                />
+              </div>
 
-      <div className="withCard">
-        <p>{value.name}</p>
+              <div className="withCard">
+                <p>{value.name}</p>
 
-        <div className="detailTypes">
-          {value.types.map((t) => (
-            <span
-              key={t.type.name}
-              className={`type-${t.type.name}`}
-            >
-              {t.type.name}
-            </span>
-          ))}
-        </div>
-      </div>
+                <div className="detailTypes">
+                  {value.types.map((t) => (
+                    <span
+                      key={t.type.name}
+                      className={`type-${t.type.name}`}
+                    >
+                      {t.type.name}
+                    </span>
+                  ))}
+                </div>
+              </div>
 
-    </div>
+            </div>
 
-  </div>
-)}
+          </div>
+        )}
       </div>
       <div className='cardList'>
         {pokemonList.map((p) => (
@@ -240,73 +242,106 @@ function App() {
             >
               {selected.name}
             </h2>
-            <div className="description">
-              <span className="descriptionTitle">Description: </span>
-              <p>{description || 'Loading description...'}</p>
+            <div className='cardTabs'>
+              <button
+                className={activeTab === 'about' ? 'active' : ''}
+                onClick={() => setActiveTab('about')}
+              >
+                About
+              </button>
+
+              <button
+                className={activeTab === 'stats' ? 'active' : ''}
+                onClick={() => setActiveTab('stats')}
+              >
+                Stats
+              </button>
             </div>
+            {activeTab === 'about' && (
+              <div className='aboutSection'>
+                <div className="description">
+                  <span className="descriptionTitle">Description: </span>
+                  <p>{description || 'Loading description...'}</p>
+                </div>
 
-            <div className="infoList">
-              <div className="infoBox">
-                <span>ID</span>
-                <strong>#{selected.id}</strong>
+                <div className="infoList">
+                  <div className="infoBox">
+                    <span>ID</span>
+                    <strong>#{selected.id}</strong>
+                  </div>
+
+                  <div className="infoBox">
+                    <span>Height</span>
+                    <strong>{selected.height}</strong>
+                  </div>
+
+                  <div className="infoBox">
+                    <span>Weight</span>
+                    <strong>{selected.weight}</strong>
+                  </div>
+                </div>
+
+                <div className="detailSection">
+                  <span className="sectionTitle">Types</span>
+
+                  <div className="detailTypes">
+                    {selected.types.map((t) => (
+                      <span
+                        key={t.type.name}
+                        className={`type-${t.type.name}`}
+                      >
+                        {t.type.name}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                <div className="detailSection">
+                  <span className="sectionTitle">Abilities</span>
+
+                  <div className="abilities">
+                    {selected.abilities.map((a) => (
+                      <span key={a.ability.name}>
+                        {a.ability.name}
+                      </span>
+                    ))}
+                  </div>
+                </div>
               </div>
+            )}
 
-              <div className="infoBox">
-                <span>Height</span>
-                <strong>{selected.height}</strong>
-              </div>
+            {activeTab === 'stats' && (
+              <div className='statsList'>
+                <div className='totalStats'>
+                  <span>Total Base Stats</span>
+                  <strong>
+                    {selected.stats.reduce(
+                      (total, stat) => total + stat.base_stat,
+                      0
+                    )}
+                  </strong>
+                </div>
 
-              <div className="infoBox">
-                <span>Weight</span>
-                <strong>{selected.weight}</strong>
-              </div>
-            </div>
-            <div className="detailSection">
-              <span className="sectionTitle">Types</span>
+                {selected.stats.map((s) => (
+                  <div key={s.stat.name} className='statRow'>
+                    <div className='statTop'>
+                      <span>{s.stat.name}</span>
+                      <span>{s.base_stat}</span>
+                    </div>
 
-              <div className="detailTypes">
-                {selected.types.map((t) => (
-                  <span
-                    key={t.type.name}
-                    className={`type-${t.type.name}`}
-                  >
-                    {t.type.name}
-                  </span>
+                    <div className='statBar'>
+                      <div
+                        className={`statFill stat-${s.stat.name}`}
+                        style={{
+                          width: `${(s.base_stat / 255) * 100}%`
+                        }}
+                      ></div>
+                    </div>
+                  </div>
                 ))}
               </div>
-            </div>
-            <div className="detailSection">
-              <span className="sectionTitle">Abilities</span>
+            )}
 
-              <div className="abilities">
-                {selected.abilities.map((a) => (
-                  <span key={a.ability.name}>
-                    {a.ability.name}
-                  </span>
-                ))}
-              </div>
-            </div>
-            <div className='statsList'>
-  {selected.stats.map((s) => (
-    <div key={s.stat.name} className='statRow'>
 
-      <div className='statTop'>
-        <span>{s.stat.name}</span>
-        <span>{s.base_stat}</span>
-      </div>
-
-      <div className='statBar'>
-        <div
-          className={`statFill stat-${s.stat.name}`}
-          style={{
-            width: `${Math.min(s.base_stat, 100)}%`
-          }}
-        ></div>
-      </div>
-
-    </div>
-  ))}
-</div>
           </div>
         </div>
       )}
